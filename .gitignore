@@ -1,0 +1,7 @@
+*.libspec
+/*.project
+/__pycache__
+/*.html
+/out
+/*.xml
+/*.png

@@ -1,0 +1,30 @@
+*** Settings ***
+Library    Collections
+Library    Selenium2Library
+
+*** Variables ***
+${dcTrackUrl}    https://140.124.181.91
+${browser}    chrome
+${userNameField}    input[@id='login']
+${userPasswordField}    input[@id='password']
+${userName}    admin
+${userPassword}    sunbird
+${loginButton}    input[@value='Log in']
+${assetsTab}    *[text()='Assets']
+${itemsListOption}    *[text()='Items List']
+${toolbarButtonsLabel}    navbar[@id='itemList']//button//label[contains(@class,'hidden')]
+
+*** Keywords ***
+Get Elements Text
+    [Arguments]    ${locator}
+    @{texts} =    Create List
+    @{elements} =    Get WebElements    ${locator}
+    :FOR    ${element}    IN    @{elements}
+    \    ${text} =    Get Text    ${element}
+    \    Append To List    ${texts}    ${text}
+    [Return]    @{texts}
+
+Login As Administrator
+    Input Text    xpath://${userNameField}    ${userName}
+    Input Password    xpath://${userPasswordField}    ${userPassword}
+    Click Button    xpath://${loginButton}
