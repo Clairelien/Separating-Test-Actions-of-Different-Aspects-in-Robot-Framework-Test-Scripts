@@ -2,7 +2,6 @@
 Library    Selenium2Library
 Library    Collections
 Resource    Keyword.txt
-Resource    pre_and_post_actions.robot
 Test Setup    Open DcTrack And Login As Administrator
 Test Teardown    Close Browser
 

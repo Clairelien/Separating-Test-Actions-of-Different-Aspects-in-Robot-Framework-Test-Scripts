@@ -1,3 +1,4 @@
+import os
 from robot.running.builder import ResourceFileBuilder
 from robot.model import SuiteVisitor
 from robot.libraries.BuiltIn import BuiltIn
@@ -20,6 +21,9 @@ class actions_handler:
                         self.post_actions.append([tag.split(':')[1], 'Unselect Frame'])
                 elif tag.split(':')[0] == 'post':
                     self.post_actions.append([tag.split(':')[1], kw.name])
+
+    def start_suite(self, name, attributes):
+        BuiltIn().import_resource(os.path.dirname(__file__).replace('\\', '/') + '/pre_and_post_actions.robot')
 
     def start_keyword(self, name, attributes):
         for pre_action in self.pre_actions:
