@@ -2,5 +2,5 @@
 /__pycache__
 /*.html
 /out
-/*.xml
+/output.xml
 /*.png
