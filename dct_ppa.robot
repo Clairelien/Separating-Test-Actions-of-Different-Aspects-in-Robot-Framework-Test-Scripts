@@ -6,11 +6,10 @@ ${assetsFrame}    iframe[@id='id_assets_frame']
 ${dashboardFrame}    iframe[@id='id_dashboard_frame']
 ${itemsListCell}    div[contains(@class, 'ui-grid-render-container-body')]//div[contains(@class, 'ui-grid-viewport')]//div[contains(@class, 'ui-grid-cell')]
 ${dashboardElement}    *[@title='Stranded Power per Location']
-${temp}    123
 
 *** Keywords ***
 Select Assets Frame
-    [Tags]    pre:Wait Until Items List Is Shown    pre:The Toolbar Button Should Be Display In This Order    post:Enter Items List Page:1
+    [Tags]    pre:The Toolbar Button Should Be Display In This Order    post:Enter Items List Page:1
     Select Frame    xpath://${assetsFrame}
 
 Wait Until Dashboard Frame Is Visible

@@ -1,19 +1,4 @@
-from action import *
-
-# actions_list = ActionsListBuilder().build()
-# for acts in actions_list:
-#     acts.do()
-#     print('*********************')
-
-# am = ActionsMap(actions_list)
-# todo_acts = list()
-# todo_acts.append(am.get_pre_action('The Toolbar Button Should Be Display In This Order'))
-# todo_acts.append(am.get_post_action('Open DcTrack And Login As Administrator'))
-# todo_acts.append(am.get_post_action('Fake'))
-# for act in todo_acts:
-#     if act:
-#         print('do actions brf/aft %s' %act[0].where)
-#         act[0].do()
+from action import ActionsListBuilder, ActionsMap, Actions, MapBuilder
 
 class listener:
     ROBOT_LISTENER_API_VERSION = 2
@@ -35,3 +20,9 @@ class listener:
         if post_actions:
             post_actions[0].do()
 
+action_parser = ActionParser()
+action_map = action_parser.get_map()
+
+pre_actions = action_map.get_pre_actions('The Toolbar Button Should Be Display In This Order')
+for action in pre_actions:
+    action.do()
