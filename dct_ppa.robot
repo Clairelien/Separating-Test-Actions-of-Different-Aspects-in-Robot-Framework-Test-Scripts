@@ -10,21 +10,25 @@ ${temp}    123
 
 *** Keywords ***
 Select Assets Frame
-    [Tags]    pre:Wait Until Items List Is Shown    pre:The Toolbar Button Should Be Display In This Order
+    [Tags]    pre:Wait Until Items List Is Shown    pre:The Toolbar Button Should Be Display In This Order    post:Enter Items List Page:1
     Select Frame    xpath://${assetsFrame}
 
+Wait Until Dashboard Frame Is Visible
+    [Tags]    post:Open DcTrack And Login As Administrator:1
+    Wait Until Element Is Visible    xpath://${dashboardFrame}    20s
+
 Select Dashboard Frame
-    [Tags]    pre:Wait Until Dashboard Is Shown
+    [Tags]    post:Open DcTrack And Login As Administrator:2
     Select Frame    xpath://${dashboardFrame}
 
 Wait Until Dashboard Is Shown
-    [Tags]    post:Open DcTrack And Login As Administrator
+    [Tags]    post:Open DcTrack And Login As Administrator:3
     Wait Until Element Is Visible    xpath://${dashboardElement}    20s
 
-Wait Until Dashboard Frame Is Visible
-    [Tags]    pre:Select Dashboard Frame
-    Wait Until Element Is Visible    xpath://${dashboardFrame}    20s
-
 Wait Until Items List Is Shown
-    [Tags]    post:Enter Items List Page
+    [Tags]    post:Enter Items List Page:2
     Wait Until Page Contains Element    xpath://${itemsListCell}    20s
+
+Switch To Default Content
+    [Tags]    post:Wait Until Items List Is Shown    post:The Toolbar Button Should Be Display In This Order    post:Open DcTrack And Login As Administrator:4    post:Enter Items List Page:3
+    Unselect Frame

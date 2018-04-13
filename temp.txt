@@ -1,8 +1,0 @@
-# ref: https://groups.google.com/forum/#!topic/robotframework-users/8RdNjFJM0xg
-# ref: http://robot-framework.readthedocs.io/en/2.9.2/_modules/robot/running.html?highlight=TestSuiteBuilder
-
-# import os, sys
-    # def start_suite(self, name, attributes):
-    #     # print(os.path.join(os.path.dirname(__file__), 'pre_and_post_actions.robot'))
-    #     path = os.path.join(os.path.dirname(__file__),'pre_and_post_actions.robot')
-    #     BuiltIn().import_resource(path)
