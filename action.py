@@ -1,99 +1,87 @@
 import os
-import glob
 from robot.running.builder import ResourceFileBuilder
 from robot.libraries.BuiltIn import BuiltIn
 
-class Actions:
-    def __init__(self, keyword, when, where, priority=1):
-        self.keywords = [{'name': keyword, 'priority': int(priority)}]
-        self.when = when
-        self.where = where
-
-    def add(self, keyword, priority=0):
-        self.keywords.append({'name': keyword, 'priority': int(priority)})
-        self.__sort_keyword()
-
-    def __sort_keyword(self):
-        self.keywords = sorted(self.keywords, key=lambda kw: kw['priority'])
+class Action:
+    def __init__(self, keyword, priority=1):
+        self.keyword = keyword
+        self.priority = int(priority)
 
     def do(self):
-        for keyword in self.keywords:
-            BuiltIn().run_keyword(keyword['name'])
+        BuiltIn().run_keyword(self.keyword)
+        # print('do action: %s' % self.keyword)
 
-    def is_exist(self, when, where):
+class Condition:
+    def __init__(self, when, where, action):
+        self.when = when
+        self.where = where
+        self.actions = [action]
+
+    def add_action(self, action):
+        self.actions.append(action)
+        self.__sort_actions()
+
+    def is_satisfied(self, when, where):
         return self.when == when and self.where == where
 
+    def __sort_actions(self):
+        sorted(self.actions, key=lambda action: action.priority)
 
-class ActionsMap:
-    def __init__(self, actions_list):
-        self.actions_list = actions_list
-        self.pre_actions_list = list()
-        self.post_actions_list = list()
-        self.__classfy_actions()
-
-    def __classfy_actions(self):
-        for actions in self.actions_list:
-            if actions.when == 'pre':
-                self.pre_actions_list.append(actions)
-            if actions.when == 'post':
-                self.post_actions_list.append(actions)
-
-    def get_pre_action(self, where):
-        return [actions for actions in self.pre_actions_list if actions.where == where]
-
-    def get_post_action(self, where):
-        return [actions for actions in self.post_actions_list if actions.where == where]
-
-
-class ActionsListBuilder:
+class ActionMap:
     def __init__(self):
-        self.resource_files = glob.glob(
-            '**/*_ppa.robot', recursive=True) + glob.glob('**/*_ppa.txt', recursive=True)
-        self.resources = self.__build_resource()
-        self.__actions_list = list()
+        self.conditions = list()
 
-    def __build_resource(self):
-        resources = list()
-        for resource_file in self.resource_files:
-            resources.append(ResourceFileBuilder().build(resource_file))
-        return resources
+    def mapping(self, resource):
+        for keyword in resource.keywords:
+            for tag in keyword.tags:
+                self.__build_map(keyword.name, self.__convert_tag_to_condition_info(tag))
 
-    def import_actions(self):
-        for resource_file in self.resource_files:
-            BuiltIn().import_resource(os.path.dirname(__file__).replace(
-                '\\', '/') + '/' + resource_file.replace('\\', '/'))
-
-    def build(self):
-        for resource in self.resources:
-            for keyword in resource.keywords:
-                self.__build_actions_with_keyword(keyword)
-        return self.__actions_list
-
-    def __build_actions_with_keyword(self, keyword):
-        for tag in keyword.tags:
-            actions_info = self.__convert_tag_to_actions_info(tag)
-            if self.__actions_is_exist(actions_info['when'], actions_info['where']):
-                self.__add_action_to_existing_actions(
-                    keyword.name, actions_info['when'], actions_info['where'], actions_info['priority'])
-            else:
-                self.__actions_list.append(Actions(
-                    keyword.name, actions_info['when'], actions_info['where'], actions_info['priority']))
-
-    def __convert_tag_to_actions_info(self, tag):
+    def __convert_tag_to_condition_info(self, tag):
         data = tag.split(':')
         if len(data) == 3:
             return {'when': data[0], 'where': data[1], 'priority': data[2]}
         elif len(data) == 2:
             return {'when': data[0], 'where': data[1], 'priority': 1}
 
-    def __actions_is_exist(self, when, where):
-        for actions in self.__actions_list:
-            if actions.is_exist(when, where):
-                return True
-        return False
+    def __build_map(self, keyword, condition_info):
+        action = Action(keyword, condition_info['priority'])
+        for condition in self.conditions:
+            if condition.when == condition_info['when'] and condition.where == condition_info['where']:
+                condition.add_action(action)
+                return
+        self.conditions.append(
+            Condition(condition_info['when'], condition_info['where'], action))
 
-    def __add_action_to_existing_actions(self, keyword, when, where, priority):
-        for actions in self.__actions_list:
-            if actions.when == when and actions.where == where:
-                actions.add(keyword, priority)
-                break
+    def get_pre_actions(self, where):
+        for condition in self.conditions:
+            if condition.is_satisfied('pre', where):
+                return condition.actions
+        return []
+
+    def get_post_actions(self, where):
+        for condition in self.conditions:
+            if condition.is_satisfied('post', where):
+                return condition.actions
+        return []
+
+
+class ActionParser:
+    def __init__(self, resource_files):
+        self.resource_files = resource_files
+        self.resources = self.__build_resource()
+        self.action_map = ActionMap()
+        self.__parse()
+
+    def __build_resource(self):
+        return [ResourceFileBuilder().build(resource_file) for resource_file in self.resource_files]
+
+    def import_actions(self):
+        for resource_file in self.resource_files:
+            BuiltIn().import_resource(os.path.dirname(__file__).replace('\\', '/') + '/' + resource_file.replace('\\', '/'))
+
+    def __parse(self):
+        for resource in self.resources:
+            self.action_map.mapping(resource)
+
+    def get_action_map(self):
+        return self.action_map
