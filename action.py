@@ -46,7 +46,7 @@ class ActionMap:
     def __build_map(self, keyword, condition_info):
         action = Action(keyword, condition_info['priority'])
         for condition in self.conditions:
-            if condition.when == condition_info['when'] and condition.where == condition_info['where']:
+            if condition.is_satisfied(condition_info['when'], condition_info['where']):
                 condition.add_action(action)
                 return
         self.conditions.append(

@@ -3,6 +3,7 @@
     <configVersion>1</configVersion>
     <relativeTo>WORKSPACE</relativeTo>
     <referencedLibrary type="PYTHON" name="Selenium2Library" path="C:/Users/Claire/AppData/Local/Programs/Python/Python36-32/Lib/site-packages/Selenium2Library"/>
+    <referencedLibrary type="PYTHON" name="fbSeleniumLibrary" path="Sandbox"/>
     <pythonpath/>
     <classpath/>
     <excludedForValidation/>
