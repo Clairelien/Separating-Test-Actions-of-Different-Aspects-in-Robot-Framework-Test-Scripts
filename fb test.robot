@@ -1,27 +1,30 @@
 *** Settings ***
 Library    fbSeleniumLibrary
-# Test Teardown    Close All Browsers
+Test Teardown    Close All Browsers
 
 *** Test Cases ***
 chat
     Open Facebook And Login    user1
     Open Messenger Page
-    Open Friend's The Conversation Record    user2
-    Send A Message To Friend   hello
-    Capture Page Screenshot
-    # Open Facebook And Login    user2
-    # Open Messenger Page
-    # Open Friend's The Conversation Record    user1
-    # Capture Page Screenshot
+    Open Facebook And Login    user2
+    Open Messenger Page
+    Send A Message To The Friend   user1    user2    hello
+    Verify The Frined Has Received The Message  user2   user1    hello
 
 *** Keywords ***
-Send A Message To Friend
-    [Arguments]    ${message}
-    Wait Until Page Contains Element    xpath://div[@aria-label='輸入訊息⋯⋯']/descendant::*[last()-1]
-    Type Text    xpath://div[@aria-label='輸入訊息⋯⋯']/descendant::*[last()-1]    ${message}
-    # Input Text    xpath://div[@aria-label='輸入訊息⋯⋯']/descendant::*[last()]    ${message}
-    # Execute Javascript    $x("//div[@aria-label='輸入訊息⋯⋯']/descendant::*[last()]").innerHTML = ${message}
-    Sleep    3s    
+Verify The Frined Has Received The Message
+    Switch Browser    user2
+    Open Friend's The Conversation Record    user1
+    Element Should Be Visible    xpath://div[@aria-label='訊息']//h5[@aria-label='&{user2}[name]']/following-sibling::*[normalize-space()='hello']
+
+Send A Message To The Friend
+    [Arguments]    ${sender}    ${receiver}    ${message}
+    Switch Browser    ${sender}
+    Open Friend's The Conversation Record    ${receiver}
+    Wait Until Page Contains Element    xpath://div[@aria-label='輸入訊息⋯⋯']
+    Click Element    xpath://div[@aria-label='輸入訊息⋯⋯']
+    Type Text And Send    ${message}
+    # ensure the message is sent
 
 Open Friend's The Conversation Record
     [Arguments]    ${friend}
