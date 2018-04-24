@@ -9,7 +9,6 @@ class Action:
 
     def do(self):
         BuiltIn().run_keyword(self.keyword)
-        # print('do action: %s' % self.keyword)
 
 class Condition:
     def __init__(self, when, where, action):
