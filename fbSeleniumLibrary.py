@@ -17,6 +17,8 @@ class fbSeleniumLibrary(SeleniumLibrary):
 
     @keyword(name='Type Text And Send')
     def type_text_and_send(self, text):
-        #     element = self.__web_element__(locator)
         ActionChains(self.driver).send_keys(text).send_keys(Keys.ENTER).perform()
-        # self.driver.execute_script('arguments[0].innerHTML = "<span data-text=\'true\'>%s</span>";' % text, element)
+
+    @keyword(name='Set Throughput')
+    def set_throughput(self, _latency, _download_throughput, _upload_throughput):
+        self._current_browser().set_network_conditions(latency=int(_latency), download_throughput=int(_download_throughput), upload_throughput=int(_upload_throughput))
