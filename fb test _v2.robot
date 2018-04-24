@@ -18,28 +18,33 @@ Verify ${receiver} Has Received The Message '${message}' From ${sender}
 ${sender} Sends A Message '${message}' To ${receiver}
     Switch Browser    ${sender}
     Open Friend's Conversation Record    ${receiver}
-    Wait Until Page Contains Element    xpath://${typingArea}
+    Send A Message    ${message}
+    # Wait Until Page Contains Element    xpath://div[@aria-label='訊息']//h5[@aria-label='&{${sender}}[name]'][last()]/following-sibling::*[normalize-space()='${message}']/span[@title='已傳送']
+
+Send A Message
+    [Arguments]    ${message}
+    # **Wait Until Page Contains Element    xpath://${typingArea}
     Click Element    xpath://${typingArea}
     Type Text And Send    ${message}
-    Wait Until Page Contains Element    xpath://div[@aria-label='訊息']//h5[@aria-label='&{${sender}}[name]'][last()]/following-sibling::*[normalize-space()='${message}']/span[@title='已傳送']
 
 Open Friend's Conversation Record
     [Arguments]    ${friend}
-    Wait Until Page Contains Element    xpath://${conversationList}//*[text()='&{${friend}}[name]']
+    # Wait Until Page Contains Element    xpath://${conversationList}//*[text()='&{${friend}}[name]']
     Click Element    xpath://${conversationList}//*[text()='&{${friend}}[name]']
-    Wait Until Page Contains Element    xpath://${friendsInfoPanel}
+    # **Wait Until Page Contains Element    xpath://${friendsInfoPanel}
 
 ${user} Open Facebook Messenger
-    Open Facebook And Login As ${user}
+    Open Facebook And Login    ${user}
     Click Element    xpath://${messengerButton}
-    Wait Until Page Contains Element    xpath://${messengerSideBar}
+    # Wait Until Page Contains Element    xpath://${messengerSideBar}
 
-Open Facebook And Login As ${user}
+Open Facebook And Login
+    [Arguments]    ${user}
     Chrome With Preferences    ${facebookURL}    alias=${user}
     Input Text    id:email    &{${user}}[email]
     Input Password    id:pass    &{${user}}[password]
     Click Element    xpath://${loginButton}
-    Wait Until Page Contains Element    xpath://${topBar}//*[text()='&{${user}}[name]']
+    # **Wait Until Page Contains Element    xpath://${topBar}//*[text()='&{${user}}[name]']
 
 Chrome With Preferences
     [Arguments]    ${url}    ${alias}=${EMPTY}
