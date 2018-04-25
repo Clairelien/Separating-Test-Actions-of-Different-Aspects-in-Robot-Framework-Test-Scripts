@@ -1,4 +1,5 @@
 import os
+import re
 from robot.running.builder import ResourceFileBuilder
 from robot.libraries.BuiltIn import BuiltIn
 
@@ -21,7 +22,7 @@ class Condition:
         self.__sort_actions()
 
     def is_satisfied(self, when, where):
-        return self.when == when and self.where == where
+        return self.when == when and re.match(self.where, where)
 
     def __sort_actions(self):
         sorted(self.actions, key=lambda action: action.priority)
@@ -38,9 +39,9 @@ class ActionMap:
     def __convert_tag_to_condition_info(self, tag):
         data = tag.split(':')
         if len(data) == 3:
-            return {'when': data[0], 'where': data[1], 'priority': data[2]}
+            return {'when': data[0], 'where': data[1].replace('*', '.*'), 'priority': data[2]}
         elif len(data) == 2:
-            return {'when': data[0], 'where': data[1], 'priority': 1}
+            return {'when': data[0], 'where': data[1].replace('*', '.*'), 'priority': 1}
 
     def __build_map(self, keyword, condition_info):
         action = Action(keyword, condition_info['priority'])
