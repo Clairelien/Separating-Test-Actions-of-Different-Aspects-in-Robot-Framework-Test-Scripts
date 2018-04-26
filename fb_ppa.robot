@@ -6,7 +6,7 @@ Wait Until Facebook Main Page Is Shown
     [Tags]    post:Open Facebook And Login
     Wait Until Page Contains Element    xpath://${topbarOfMainPage}
     Wait Until Page Contains Element    xpath://${contentOfMainPage}
-    
+
 Wait Until Friend's Conversation Record Is Opened
     [Tags]    post:Open Friend's Conversation Record
     Wait Until Page Contains Element    xpath://${friendsInfoPanel}
@@ -21,10 +21,15 @@ Wait Until Messenger Is Opened
     Wait Until Page Contains Element    xpath://${messengerSideBar}
 
 Wait Until Message Is Sent
-    [Tags]    post:* Sends A Message '*' To *
+    [Tags]    post:Send A Message
     Wait Until Page Contains Element    xpath://${messageContainer}//${latestUnreadMessage}
 
+Wait Until Friends List Is Shown
+    [Tags]    pre:Open Friend's Conversation Record
+    Wait Until Page Contains Element    xpath://${conversationList}/li
+
 *** Variables ***
+${conversationList}    ul[@aria-label='對話清單']
 ${latestUnreadMessage}    h5[contains(@class, 'accessible_elem')]/following-sibling::*/span[@title='已傳送']
 ${messageContainer}    div[@aria-label='訊息']
 ${messengerSideBar}    a[@title='新訊息']

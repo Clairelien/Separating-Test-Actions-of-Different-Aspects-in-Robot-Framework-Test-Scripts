@@ -1,5 +1,6 @@
 *** Settings ***
 Library    fbSeleniumLibrary
+Resource    keywords.txt
 Test Teardown    Close All Browsers
 
 *** Test Cases ***
@@ -31,7 +32,6 @@ Send A Message
 
 Open Friend's Conversation Record
     [Arguments]    ${friend}
-    Wait Until Page Contains Element    xpath://${conversationList}//*[text()='&{${friend}}[name]']
     Click Element    xpath://${conversationList}//*[text()='&{${friend}}[name]']
 
 Open Facebook And Login
@@ -40,24 +40,6 @@ Open Facebook And Login
     Input Text    id:email    &{${user}}[email]
     Input Password    id:pass    &{${user}}[password]
     Click Element    xpath://${loginButton}
-
-Chrome With Preferences
-    [Arguments]    ${url}    ${alias}=${EMPTY}
-    ${chrome_options} =    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-    Call Method    ${chrome_options}    add_argument    --disable-notifications
-    Create WebDriver    Chrome    chrome_options=${chrome_options}    alias=${alias}
-    Maximize Browser Window
-    Go To    ${url}
-    Set Throughput Regular 2G
-
-Set Throughput Regular 2G
-    Set Throughput    300    256000    51200
-
-Set Throughput Good 2G
-    Set Throughput    150    460800    153600
-
-Set Throughput Good 3G
-    Set Throughput    40    1536000    768000
 
 *** Variables ***
 ${typingArea}    div[@aria-label='輸入訊息⋯⋯']

@@ -1,5 +1,6 @@
 *** Settings ***
 Library    fbSeleniumLibrary
+Resource    keywords.txt
 Test Teardown    Close All Browsers
 
 *** Test Cases ***
@@ -13,53 +14,42 @@ Sending Message To Friend
 Verify ${receiver} Has Received The Message '${message}' From ${sender}
     Switch Browser    ${receiver}
     Open Friend's Conversation Record    ${sender}
-    Page Should Contain Element    xpath://div[@aria-label='訊息']//h5[@aria-label='&{${sender}}[name]'][last()]/following-sibling::*[normalize-space()='${message}']
+    Page Should Contain Element    xpath://${messageContainer}//h5[@aria-label='&{${sender}}[name]'][last()]/following-sibling::*[normalize-space()='${message}']
 
 ${sender} Sends A Message '${message}' To ${receiver}
     Switch Browser    ${sender}
     Open Friend's Conversation Record    ${receiver}
+    Send A Message    ${message}
+
+Send A Message
+    [Arguments]    ${message}
     Wait Until Page Contains Element    xpath://${typingArea}
     Click Element    xpath://${typingArea}
     Type Text And Send    ${message}
-    Wait Until Page Contains Element    xpath://div[@aria-label='訊息']//h5[@aria-label='&{${sender}}[name]'][last()]/following-sibling::*[normalize-space()='${message}']/span[@title='已傳送']
+    Wait Until Page Contains Element    xpath://${messageContainer}//${latestUnreadMessage}
 
 Open Friend's Conversation Record
     [Arguments]    ${friend}
-    Wait Until Page Contains Element    xpath://${conversationList}//*[text()='&{${friend}}[name]']
+    Wait Until Page Contains Element    xpath://${conversationList}/li
     Click Element    xpath://${conversationList}//*[text()='&{${friend}}[name]']
     Wait Until Page Contains Element    xpath://${friendsInfoPanel}
 
 ${user} Open Facebook Messenger
-    Open Facebook And Login As ${user}
+    Open Facebook And Login    ${user}
     Click Element    xpath://${messengerButton}
     Wait Until Page Contains Element    xpath://${messengerSideBar}
 
-Open Facebook And Login As ${user}
+Open Facebook And Login
+    [Arguments]    ${user}
     Chrome With Preferences    ${facebookURL}    alias=${user}
     Input Text    id:email    &{${user}}[email]
     Input Password    id:pass    &{${user}}[password]
     Click Element    xpath://${loginButton}
     Wait Until Page Contains Element    xpath://${topBar}//*[text()='&{${user}}[name]']
 
-Chrome With Preferences
-    [Arguments]    ${url}    ${alias}=${EMPTY}
-    ${chrome_options} =    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-    Call Method    ${chrome_options}    add_argument    --disable-notifications
-    Create WebDriver    Chrome    chrome_options=${chrome_options}    alias=${alias}
-    Maximize Browser Window
-    Go To    ${url}
-    Set Throughput Regular 2G
-
-Set Throughput Regular 2G
-    Set Throughput    300    256000    51200
-
-Set Throughput Good 2G
-    Set Throughput    150    460800    153600
-
-Set Throughput Good 3G
-    Set Throughput    40    1536000    768000
-
 *** Variables ***
+${latestUnreadMessage}    h5[contains(@class, 'accessible_elem')]/following-sibling::*/span[@title='已傳送']
+${messageContainer}    div[@aria-label='訊息']
 ${typingArea}    div[@aria-label='輸入訊息⋯⋯']
 ${topBar}    div[@id='pagelet_bluebar']
 ${loginButton}    label[@id='loginbutton']

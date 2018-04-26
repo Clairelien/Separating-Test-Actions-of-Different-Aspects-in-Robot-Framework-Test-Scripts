@@ -1,0 +1,21 @@
+*** Settings ***
+Library    fbSeleniumLibrary
+
+*** Keywords ***
+Chrome With Preferences
+    [Arguments]    ${url}    ${alias}=${EMPTY}
+    ${chrome_options} =    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+    Call Method    ${chrome_options}    add_argument    --disable-notifications
+    Create WebDriver    Chrome    chrome_options=${chrome_options}    alias=${alias}
+    Maximize Browser Window
+    Go To    ${url}
+    Set Throughput Regular 2G
+
+Set Throughput Regular 2G
+    Set Throughput    300    256000    51200
+
+Set Throughput Good 2G
+    Set Throughput    150    460800    153600
+
+Set Throughput Good 3G
+    Set Throughput    40    1536000    768000
