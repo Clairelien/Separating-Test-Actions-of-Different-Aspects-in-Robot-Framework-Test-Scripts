@@ -1,5 +1,6 @@
 import os
 import re
+# import glob
 from robot.running.builder import ResourceFileBuilder
 from robot.libraries.BuiltIn import BuiltIn
 
@@ -12,17 +13,22 @@ class Action:
         BuiltIn().run_keyword(self.keyword)
 
 class Condition:
-    def __init__(self, when, where, action):
-        self.when = when
-        self.where = where
+    def __init__(self, when, where, action, status=None):
+        self.when = when.replace('*', '.*')
+        self.where = where.replace('*', '.*')
         self.actions = [action]
+        self.status = status
+        if self.status:
+            self.status = self.status.upper()
 
     def add_action(self, action):
         self.actions.append(action)
         self.__sort_actions()
 
-    def is_satisfied(self, when, where):
-        return self.when == when and re.match(self.where, where)
+    def is_satisfied(self, when, where, status):
+        if self.status:
+            return re.match(self.when, when) and re.match(self.where, where) and self.status == status.upper()
+        return re.match(self.when, when) and re.match(self.where, where)
 
     def __sort_actions(self):
         sorted(self.actions, key=lambda action: action.priority)
@@ -34,33 +40,33 @@ class ActionMap:
     def mapping(self, resource):
         for keyword in resource.keywords:
             for tag in keyword.tags:
-                self.__build_map(keyword.name, self.__convert_tag_to_condition_info(tag))
+                data = tag.split(':')
+                kwargs = self.__convert_kwargs(data[2:])
+                self.__build_map(keyword.name, data[0], data[1], **kwargs)
 
-    def __convert_tag_to_condition_info(self, tag):
-        data = tag.split(':')
-        if len(data) == 3:
-            return {'when': data[0], 'where': data[1].replace('*', '.*'), 'priority': data[2]}
-        elif len(data) == 2:
-            return {'when': data[0], 'where': data[1].replace('*', '.*'), 'priority': 1}
+    def __convert_kwargs(self, data):
+        kwargs = dict()
+        for arg in data:
+            kwargs[arg.split('=')[0]] = arg.split('=')[1]
+        return kwargs
 
-    def __build_map(self, keyword, condition_info):
-        action = Action(keyword, condition_info['priority'])
+    def __build_map(self, keyword, when,  where, priority=1, status=None):
+        action = Action(keyword, priority)
         for condition in self.conditions:
-            if condition.is_satisfied(condition_info['when'], condition_info['where']):
+            if condition.is_satisfied(when, where, status):
                 condition.add_action(action)
                 return
-        self.conditions.append(
-            Condition(condition_info['when'], condition_info['where'], action))
+        self.conditions.append(Condition(when, where, action, status))
 
     def get_pre_actions(self, where):
         for condition in self.conditions:
-            if condition.is_satisfied('pre', where):
+            if condition.is_satisfied('pre', where, None):
                 return condition.actions
         return []
 
-    def get_post_actions(self, where):
+    def get_post_actions(self, where, status):
         for condition in self.conditions:
-            if condition.is_satisfied('post', where):
+            if condition.is_satisfied('post', where, status):
                 return condition.actions
         return []
 
@@ -85,3 +91,6 @@ class ActionParser:
 
     def get_action_map(self):
         return self.action_map
+
+# action_parser = ActionParser(glob.glob(
+#     '**/*_ppa.robot', recursive=True) + glob.glob('**/*_ppa.txt', recursive=True))

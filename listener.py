@@ -1,5 +1,6 @@
 from action import ActionParser
 import glob
+from robot.libraries.BuiltIn import BuiltIn
 
 class listener:
     ROBOT_LISTENER_API_VERSION = 2
@@ -15,5 +16,5 @@ class listener:
             action.do()
 
     def end_keyword(self, name, attributes):
-        for action in self.action_map.get_post_actions(name):
+        for action in self.action_map.get_post_actions(name, attributes['status']):
             action.do()
