@@ -36,7 +36,7 @@ Open Friend's Conversation Record
 
 Open Facebook And Login
     [Arguments]    ${user}
-    Chrome With Preferences    ${facebookURL}    alias=${user}
+    Open Browser With Chrome    ${facebookURL}    alias=${user}
     Input Text    id:email    &{${user}}[email]
     Input Password    id:pass    &{${user}}[password]
     Click Element    xpath://${loginButton}
