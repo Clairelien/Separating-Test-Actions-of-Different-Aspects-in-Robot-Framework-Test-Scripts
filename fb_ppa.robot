@@ -33,6 +33,16 @@ Capture Screenshot On Failure
     # [Tags]    post:!fbSeleniumLibrary.*:status=fail
     Capture Page Screenshot
 
+Capture Screenshot On Failure3
+    [Tags]    post:*:status=fail:priority=2
+    # [Tags]    post:!fbSeleniumLibrary.*:status=fail
+    Capture Page Screenshot
+
+Capture Screenshot On Failure2
+    [Tags]    post:*:status=fail:priority=2
+    # [Tags]    post:!fbSeleniumLibrary.*:status=fail
+    Capture Page Screenshot
+
 *** Variables ***
 ${conversationList}    ul[@aria-label='對話清單']
 ${latestUnreadMessage}    h5[contains(@class, 'accessible_elem')]/following-sibling::*/span[@title='已傳送']

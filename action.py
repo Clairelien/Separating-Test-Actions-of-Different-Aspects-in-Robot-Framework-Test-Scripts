@@ -1,6 +1,6 @@
 import os
 import re
-# import glob
+import glob
 from robot.running.builder import ResourceFileBuilder
 from robot.libraries.BuiltIn import BuiltIn
 
@@ -16,22 +16,23 @@ class Condition:
     def __init__(self, when, where, action, status=None):
         self.when = when.replace('*', '.*')
         self.where = where.replace('*', '.*')
-        self.actions = [action]
+        self.action = action
         self.status = status
         if self.status:
             self.status = self.status.upper()
 
-    def add_action(self, action):
-        self.actions.append(action)
-        self.__sort_actions()
+    # def add_action(self, action):
+    #     self.actions.append(action)
+    #     self.__sort_actions()
 
+    #TODO: add 'not' operation
     def is_satisfied(self, when, where, status):
         if self.status:
             return re.match(self.when, when) and re.match(self.where, where) and self.status == status.upper()
         return re.match(self.when, when) and re.match(self.where, where)
 
-    def __sort_actions(self):
-        sorted(self.actions, key=lambda action: action.priority)
+    # def __sort_actions(self):
+    #     sorted(self.actions, key=lambda action: action.priority)
 
 class ActionMap:
     def __init__(self):
@@ -51,24 +52,29 @@ class ActionMap:
         return kwargs
 
     def __build_map(self, keyword, when,  where, priority=1, status=None):
-        action = Action(keyword, priority)
-        for condition in self.conditions:
-            if condition.is_satisfied(when, where, status):
-                condition.add_action(action)
-                return
-        self.conditions.append(Condition(when, where, action, status))
+        # action = Action(keyword, priority)
+        # for condition in self.conditions:
+        #     if condition.is_satisfied(when, where, status):
+        #         condition.add_action(action)
+        #         return
+        # self.conditions.append(Condition(when, where, action, status))
+        self.conditions.append(Condition(when, where, Action(keyword, priority), status))
 
     def get_pre_actions(self, where):
+        pre_actions = list()
         for condition in self.conditions:
             if condition.is_satisfied('pre', where, None):
-                return condition.actions
-        return []
+                pre_actions.append(condition.action)
+        return sorted(pre_actions, key=lambda action: action.priority)
+        return pre_actions
 
     def get_post_actions(self, where, status):
+        post_actions = list()        
         for condition in self.conditions:
             if condition.is_satisfied('post', where, status):
-                return condition.actions
-        return []
+                post_actions.append(condition.action)
+        return sorted(post_actions, key=lambda action: action.priority)        
+        # return post_actions
 
 
 class ActionParser:
@@ -92,5 +98,8 @@ class ActionParser:
     def get_action_map(self):
         return self.action_map
 
-# action_parser = ActionParser(glob.glob(
-#     '**/*_ppa.robot', recursive=True) + glob.glob('**/*_ppa.txt', recursive=True))
+action_parser = ActionParser(glob.glob('**/*_ppa.robot', recursive=True) + glob.glob('**/*_ppa.txt', recursive=True))
+am = action_parser.get_action_map()
+acts = am.get_post_actions('log', 'FAIL')
+for act in acts:
+    print(act.keyword)
