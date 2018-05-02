@@ -51,6 +51,9 @@ Open Test Page On Facebook
 
 Open Website With Facebook Page Plugin
     Open Browser With Chrome    ${CURDIR}/${pagePluginWeb}    alias=${pagePluginAlias}
+    Verify There Is No Post On Page From Page Plugin
+
+Verify There Is No Post On Page From Page Plugin
     Wait Until Page Contains Element    id:fb_plugin
     Select Frame    id:fb_plugin
     Page Should Not Contain Element    xpath://${containerOfPosts}//p
