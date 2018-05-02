@@ -4,12 +4,6 @@ Resource    keywords.txt
 Test Teardown    Close All Browsers
 
 *** Test Cases ***
-test
-    Open Browser    ${facebookURL}    browser=gc
-    Click Element    id:a
-    Log    123
-    Should Be Equal    1    2
-
 Sending Message To Friend
     Dave Open Facebook Messenger
     Rick Open Facebook Messenger

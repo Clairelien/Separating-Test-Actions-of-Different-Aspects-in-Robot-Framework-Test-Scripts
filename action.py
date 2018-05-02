@@ -1,6 +1,6 @@
 import os
 import re
-import glob
+# import glob
 from robot.running.builder import ResourceFileBuilder
 from robot.libraries.BuiltIn import BuiltIn
 
@@ -15,24 +15,21 @@ class Action:
 class Condition:
     def __init__(self, when, where, action, status=None):
         self.when = when.replace('*', '.*')
-        self.where = where.replace('*', '.*')
+        self.where = where.replace('.','\.').replace('*', '.*')
         self.action = action
         self.status = status
         if self.status:
             self.status = self.status.upper()
 
-    # def add_action(self, action):
-    #     self.actions.append(action)
-    #     self.__sort_actions()
-
-    #TODO: add 'not' operation
     def is_satisfied(self, when, where, status):
         if self.status:
-            return re.match(self.when, when) and re.match(self.where, where) and self.status == status.upper()
-        return re.match(self.when, when) and re.match(self.where, where)
+            return re.match(self.when, when) and self.__match_where(where) and self.status == status.upper()
+        return re.match(self.when, when) and self.__match_where(where)
 
-    # def __sort_actions(self):
-    #     sorted(self.actions, key=lambda action: action.priority)
+    def __match_where(self, where):
+        if self.where[0] == '!':
+            return not re.match(self.where[1:], where)
+        return re.match(self.where, where)
 
 class ActionMap:
     def __init__(self):
@@ -52,12 +49,6 @@ class ActionMap:
         return kwargs
 
     def __build_map(self, keyword, when,  where, priority=1, status=None):
-        # action = Action(keyword, priority)
-        # for condition in self.conditions:
-        #     if condition.is_satisfied(when, where, status):
-        #         condition.add_action(action)
-        #         return
-        # self.conditions.append(Condition(when, where, action, status))
         self.conditions.append(Condition(when, where, Action(keyword, priority), status))
 
     def get_pre_actions(self, where):
@@ -66,16 +57,13 @@ class ActionMap:
             if condition.is_satisfied('pre', where, None):
                 pre_actions.append(condition.action)
         return sorted(pre_actions, key=lambda action: action.priority)
-        return pre_actions
 
     def get_post_actions(self, where, status):
-        post_actions = list()        
+        post_actions = list()
         for condition in self.conditions:
             if condition.is_satisfied('post', where, status):
                 post_actions.append(condition.action)
-        return sorted(post_actions, key=lambda action: action.priority)        
-        # return post_actions
-
+        return sorted(post_actions, key=lambda action: action.priority)
 
 class ActionParser:
     def __init__(self, resource_files):
@@ -98,8 +86,8 @@ class ActionParser:
     def get_action_map(self):
         return self.action_map
 
-action_parser = ActionParser(glob.glob('**/*_ppa.robot', recursive=True) + glob.glob('**/*_ppa.txt', recursive=True))
-am = action_parser.get_action_map()
-acts = am.get_post_actions('log', 'FAIL')
-for act in acts:
-    print(act.keyword)
+# action_parser = ActionParser(glob.glob('**/*_ppa.robot', recursive=True) + glob.glob('**/*_ppa.txt', recursive=True))
+# am = action_parser.get_action_map()
+# acts = am.get_post_actions('fbSeleniumLibrary.log', 'FAIL')
+# for act in acts:
+#     print(act.keyword)

@@ -22,3 +22,9 @@ class fbSeleniumLibrary(SeleniumLibrary):
     @keyword(name='Set Throughput')
     def set_throughput(self, _latency, _download_throughput, _upload_throughput):
         self._current_browser().set_network_conditions(latency=int(_latency), download_throughput=int(_download_throughput), upload_throughput=int(_upload_throughput))
+
+    @keyword(name='Open New Tab')
+    def open_new_tab(self):
+        self.driver.find_element_by_css_selector(
+            'body').send_keys(Keys.CONTROL, 't')
+        # ActionChains(self.driver).key_down(Keys.CONTROL).send_keys('t').key_up(Keys.CONTROL).perform()
