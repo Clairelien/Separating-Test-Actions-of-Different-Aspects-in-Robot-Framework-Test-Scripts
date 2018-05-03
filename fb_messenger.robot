@@ -45,7 +45,8 @@ Open Facebook And Login
     Input Text    id:email    &{${user}}[email]
     Input Password    id:pass    &{${user}}[password]
     Click Element    xpath://${loginButton}
-    Wait Until Page Contains Element    xpath://${topBar}//*[text()='&{${user}}[name]']
+    Wait Until Page Contains Element    xpath://${topbarOfMainPage}
+    Wait Until Page Contains Element    xpath://${contentOfMainPage}
 
 *** Variables ***
 ${latestUnreadMessage}    h5[contains(@class, 'accessible_elem')]/following-sibling::*/span[@title='已傳送']
@@ -58,5 +59,7 @@ ${conversationList}    ul[@aria-label='對話清單']
 ${friendsInfoPanel}    div[@data-testid='info_panel']
 ${messengerSideBar}    a[@title='新訊息']
 ${messengerButton}    *[text()='Messenger']
+${contentOfMainPage}    div[@id='content']
+${topbarOfMainPage}    div[@id='pagelet_bluebar']
 &{Dave}    name=Dave Albecgjdfggca Bushakescu    email=ztiikid_bushakescu_1523290582@tfbnw.net    password=d0mefe8fu8w
 &{Rick}    name=Rick Albebehacbejg Warmanson    email=edwywar_warmanson_1523290486@tfbnw.net    password=coz4upprct4

@@ -4,7 +4,7 @@ Resource    keywords.txt
 Test Teardown    Delete The Post And Close Browsers
 
 *** Test Cases ***
-test
+Page plugin
     Open Website With Facebook Page Plugin
     Open Test Page On Facebook
     Post A New Post    hello
@@ -17,47 +17,50 @@ Delete The Post And Close Browsers
     Close All Browsers
 
 Delete The Post
-    Wait Until Page Contains Element    xpath://${actionsOfPost}
+    Click Actions Button Of Post
+    Click Delect Post Option
+    Click Delete Button
+
+Click Actions Button Of Post
     Click Element    xpath://${actionsOfPost}
-    Wait Until Page Contains Element    xpath://${deletePostOption}
+
+Click Delect Post Option
     Click Element    xpath://${deletePostOption}
-    Wait Until Page Contains Element    xpath://${deleteButton}
+
+Click Delete Button
     Click Element    xpath://${deleteButton}
-    Wait Until Page Does Not Contain    xpath:(//${containerOfPosts}/p)[1][text()='${contentOfPost}']
 
 Verify The New Post Is Shown On Page Plugin
     Switch Browser    ${pagePluginAlias}
     Reload Page
-    Wait Until Page Contains Element    id:fb_plugin
-    Select Frame    id:fb_plugin
-    Wait Until Page Contains Element    xpath://div[contains(@class, 'userContentWrapper')]
+    New Post Should Be Visible
+
+New Post Should Be Visible
     Page Should Contain Element    xpath://div[contains(@class, 'userContent')]//p[text()='${contentOfPost}']
-    Unselect Frame
 
 Post A New Post
     [Arguments]    ${content}
     Set Test Variable    ${contentOfPost}    ${content}
-    Wait Until Page Contains Element    xpath://${newPostTextarea}    15s
-    Input Text    xpath://${newPostTextarea}    ${content}
-    Wait Until Page Contains Element    xpath://${postButton}[not(@disabled)]    15s
+    Input New Post    ${content}
+    Click Post Button
+
+Input New Post
+    [Arguments]    ${text}
+    Input Text    xpath://${newPostTextarea}    ${text}
+
+Click Post Button
     Click Button    xpath://${postButton}
-    Wait Until Page Contains Element    xpath:(//${containerOfPosts}/p)[1][text()='${content}']    20s
 
 Open Test Page On Facebook
     Open Facebook And Login    WuLee
     Click Element    xpath://${pinnedNav}//li[1]
-    Wait Until Page Contains Element    xpath://${sidebarOfPage}//*[text()='Test']    15s
-    Wait Until Page Contains Element    xpath://${mainColumnOfPage}    15s
 
 Open Website With Facebook Page Plugin
     Open Browser With Chrome    ${CURDIR}/${pagePluginWeb}    alias=${pagePluginAlias}
     Verify There Is No Post On Page From Page Plugin
 
 Verify There Is No Post On Page From Page Plugin
-    Wait Until Page Contains Element    id:fb_plugin
-    Select Frame    id:fb_plugin
     Page Should Not Contain Element    xpath://${containerOfPosts}//p
-    Unselect Frame
 
 Open Facebook And Login
     [Arguments]    ${user}
@@ -73,9 +76,7 @@ ${actionsOfPost}    a[@aria-label='活動紀錄選項']
 ${newPostTextarea}    div[@id='PageComposerPagelet_']//textarea
 ${postButton}    button[normalize-space()='發佈']
 ${pagePluginWeb}    test.html
-${sidebarOfPage}    div[@id='entity_sidebar']
 ${pinnedNav}    div[@id='pinnedNav']
-${mainColumnOfPage}    div[@id='pagelet_timeline_main_column']
 ${containerOfPosts}    div[contains(@class, 'userContent')]
 ${loginButton}    label[@id='loginbutton']
 ${facebookURL}    https://www.facebook.com/
