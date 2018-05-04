@@ -16,7 +16,5 @@ class listener:
             action.do()
 
     def end_keyword(self, name, attributes):
-        act = self.action_map.get_post_actions(name, attributes['status'])
-        BuiltIn().log("%s: %d %s " % (name, len(act), attributes['status']))
         for action in self.action_map.get_post_actions(name, attributes['status']):
             action.do()

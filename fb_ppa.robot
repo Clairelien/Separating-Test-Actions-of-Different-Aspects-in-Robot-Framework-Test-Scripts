@@ -32,6 +32,10 @@ Capture Screenshot On Failure
     [Tags]    post:!fbSeleniumLibrary.*:status=fail
     Capture Page Screenshot
 
+Wait Until Profile Page Is Shown
+    [Tags]    post:Go To Profile Page
+    Wait Until Page Contains Element    xpath://${contentOfProfilePage}
+
 Set Browser Position
     [Tags]    post:keywords.Open Browser With Chrome
     Set Window Position    ${x_axis}    0
@@ -40,6 +44,7 @@ Set Browser Position
 
 *** Variables ***
 ${x_axis}    0
+${contentOfProfilePage}    div[@id='pagelet_main_column_personal']
 ${conversationList}    ul[@aria-label='對話清單']
 ${latestUnreadMessage}    h5[contains(@class, 'accessible_elem')]/following-sibling::*/span[@title='已傳送']
 ${messageContainer}    div[@aria-label='訊息']

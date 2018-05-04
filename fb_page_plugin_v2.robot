@@ -82,4 +82,4 @@ ${loginButton}    label[@id='loginbutton']
 ${facebookURL}    https://www.facebook.com/
 ${pagePluginAlias}    plugin
 ${contentOfPost}    ${EMPTY}
-&{WuLee}    name=李物    email=teddygetbox001@gmail.com    password=qwert123456
+&{WuLee}    email=teddygetbox001@gmail.com    password=qwert123456

@@ -1,7 +1,6 @@
 *** Settings ***
 Library    fbSeleniumLibrary
 Resource    keywords.txt
-Test Setup    Set Selenium Speed    1s
 Test Teardown    Close All Browsers
 
 *** Test Cases ***
