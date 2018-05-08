@@ -18,7 +18,7 @@ Wait Until Test Page Is Shown
 
 Wait Until New Post is Posted
     [Tags]    post:Post A New Post
-    Wait Until Page Contains Element    xpath://${containerOfPosts}/p    20s
+    Wait Until Page Contains Element    xpath://${containerOfPosts}//p    20s
 
 Wait Until Post Container Is Shown
     [Tags]    pre:New Post Should Be Visible:priority=2
@@ -34,11 +34,11 @@ Wait Until Delete Option Is Shown
 
 Wait Until Confirm Dialog Is Shown
     [Tags]    pre:Click Delete Button
-    Wait Until Page Contains Element    xpath://${deleteButton}
+    Wait Until Element Is Visible    xpath://${deleteButton}    10s
 
 Wait Until The Post Is Deleted
     [Tags]    post:Delete The Post
-    Wait Until Page Does Not Contain Element    xpath:(//${containerOfPosts}/p)[1][text()='hello']
+    Wait Until Page Does Not Contain Element    xpath:(//${containerOfPosts}//p)[1][text()='hello']
 
 Wait Until Textarea Of New Post Is Shown
     [Tags]    pre:Input New Post
@@ -46,14 +46,14 @@ Wait Until Textarea Of New Post Is Shown
 
 Wait Until Post Button Is Enabled
     [Tags]    pre:Click Post Button
-    [Arguments]    ${arg}
     Wait Until Page Contains Element    xpath://${postButton}[not(@disabled)]    15s
 
 *** Variables ***
 ${postButton}    button[normalize-space()='發佈']
 ${newPostTextarea}    div[@id='PageComposerPagelet_']//textarea
-${deleteButton}    input[@value='刪除']
-${deletePostOption}    li[normalize-space()='從粉絲專頁刪除']
+${deleteButton}    button[text()='刪除貼文']
+# ${deleteButton}    input[@value='刪除']
+${deletePostOption}    li[contains(normalize-space(), '刪除')]
 ${actionsOfPost}    a[@aria-label='活動紀錄選項']
 ${containerOfPosts}    div[contains(@class, 'userContent')]
 ${sidebarOfPage}    div[@id='entity_sidebar']

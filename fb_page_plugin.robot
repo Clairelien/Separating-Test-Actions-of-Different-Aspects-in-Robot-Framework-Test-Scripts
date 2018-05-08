@@ -21,9 +21,9 @@ Delete The Post
     Click Element    xpath://${actionsOfPost}
     Wait Until Page Contains Element    xpath://${deletePostOption}
     Click Element    xpath://${deletePostOption}
-    Wait Until Page Contains Element    xpath://${deleteButton}
+    Wait Until Element Is Visible    xpath://${deleteButton}
     Click Element    xpath://${deleteButton}
-    Wait Until Page Does Not Contain    xpath:(//${containerOfPosts}/p)[1][text()='${contentOfPost}']
+    Wait Until Page Does Not Contain    xpath:(//${containerOfPosts}//p)[1][text()='${contentOfPost}']
 
 Verify The New Post Is Shown On Page Plugin
     Switch Browser    ${pagePluginAlias}
@@ -42,7 +42,7 @@ Post A New Post
     Input Text    xpath://${newPostTextarea}    ${content}
     Wait Until Page Contains Element    xpath://${postButton}[not(@disabled)]    15s
     Click Button    xpath://${postButton}
-    Wait Until Page Contains Element    xpath:(//${containerOfPosts}/p)[1][text()='${content}']    20s
+    Wait Until Page Contains Element    xpath:(//${containerOfPosts}//p)[1][text()='${content}']    20s
 
 Open Test Page On Facebook
     Open Facebook And Login    WuLee
@@ -72,8 +72,9 @@ Open Facebook And Login
 *** Variables ***
 ${contentOfMainPage}    div[@id='content']
 ${topbarOfMainPage}    div[@id='pagelet_bluebar']
-${deleteButton}    input[@value='刪除']
-${deletePostOption}    li[normalize-space()='從粉絲專頁刪除']
+${deleteButton}    button[text()='刪除貼文']
+# ${deleteButton}    input[@value='刪除']
+${deletePostOption}    li[contains(normalize-space(), '刪除')]
 ${actionsOfPost}    a[@aria-label='活動紀錄選項']
 ${newPostTextarea}    div[@id='PageComposerPagelet_']//textarea
 ${postButton}    button[normalize-space()='發佈']

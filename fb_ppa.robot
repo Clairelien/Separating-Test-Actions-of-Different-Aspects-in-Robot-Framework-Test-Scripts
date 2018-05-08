@@ -37,7 +37,8 @@ Wait Until Profile Page Is Shown
     Wait Until Page Contains Element    xpath://${contentOfProfilePage}
 
 Set Browser Position
-    [Tags]    post:keywords.Open Browser With Chrome
+    # [Tags]    post:keywords.Open Browser With Chrome
+    Set Window Size    960    1080
     Set Window Position    ${x_axis}    0
     ${x_axis} =    Evaluate    int(${x_axis})+960
     Set Test Variable    ${x_axis}

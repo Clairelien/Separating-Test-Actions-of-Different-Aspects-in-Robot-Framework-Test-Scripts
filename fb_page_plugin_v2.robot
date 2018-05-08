@@ -70,8 +70,9 @@ Open Facebook And Login
     Click Element    xpath://${loginButton}
 
 *** Variables ***
-${deleteButton}    input[@value='刪除']
-${deletePostOption}    li[normalize-space()='從粉絲專頁刪除']
+${deleteButton}    button[text()='刪除貼文']
+# ${deleteButton}    input[@value='刪除']
+${deletePostOption}    li[contains(normalize-space(), '刪除')]
 ${actionsOfPost}    a[@aria-label='活動紀錄選項']
 ${newPostTextarea}    div[@id='PageComposerPagelet_']//textarea
 ${postButton}    button[normalize-space()='發佈']

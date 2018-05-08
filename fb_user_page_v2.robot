@@ -21,6 +21,7 @@ Go To Profile Page
 Open Facebook And Login
     [Arguments]    ${user}
     Open Browser With Chrome    ${facebookURL}
+    Maximize Browser Window
     Input Text    id:email    &{${user}}[email]
     Input Password    id:pass    &{${user}}[password]
     Click Element    xpath://${loginButton}
