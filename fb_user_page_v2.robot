@@ -4,13 +4,13 @@ Resource    keywords.txt
 Test Teardown    Close Browser
 
 *** Test Cases ***
-User profile
+User Name In Profile Page
     Open Facebook And Login    Dave
     Go To Profile Page
-    Verify The User Name In Profile Page And On Topbar Are Consistent
+    Verify The User Name In Profile Page And On Topbar Are Identical
 
 *** Keywords ***
-Verify The User Name In Profile Page And On Topbar Are Consistent
+Verify The User Name In Profile Page And On Topbar Are Identical
     ${userNameOnTopbar} =    Get Text    xpath://${topBar}//div[@data-click='profile_icon']
     ${userNameInProfile} =    Get Text    xpath://span[@id='fb-timeline-cover-name']
     Should Be Equal    ${userNameInProfile}    ${userNameOnTopbar}

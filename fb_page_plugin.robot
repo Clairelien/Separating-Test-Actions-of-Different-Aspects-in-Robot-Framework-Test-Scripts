@@ -4,7 +4,7 @@ Resource    keywords.txt
 Test Teardown    Delete The Post And Close Browsers
 
 *** Test Cases ***
-Page plugin
+New Post On Page plugin
     Open Website With Facebook Page Plugin
     Open Test Page On Facebook
     Post A New Post    hello
