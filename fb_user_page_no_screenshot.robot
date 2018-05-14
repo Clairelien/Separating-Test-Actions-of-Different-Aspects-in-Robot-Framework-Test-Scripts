@@ -4,7 +4,7 @@ Resource    keywords.txt
 Test Teardown    Close Browser
 
 *** Test Cases ***
-User profile
+User Name In Profile Page
     Open Facebook And Login    Dave
     Go To Profile Page
     Verify The User Name In Profile Page And On Topbar Are Consistent
