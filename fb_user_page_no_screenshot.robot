@@ -31,4 +31,4 @@ ${contentOfProfilePage}    div[@id='pagelet_main_column_personal']
 ${topBar}    div[@id='pagelet_bluebar']
 ${loginButton}    label[@id='loginbutton']
 ${facebookURL}    https://www.facebook.com/
-&{Dave}    semail=ztiikid_bushakescu_1523290582@tfbnw.net    password=d0mefe8fu8w
+&{Dave}    email=ztiikid_bushakescu_1523290582@tfbnw.net    password=d0mefe8fu8w
