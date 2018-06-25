@@ -13,45 +13,59 @@ class Action:
         BuiltIn().run_keyword(self.keyword)
 
 class Condition:
-    def __init__(self, when, where, action, status=None):
+    def __init__(self, when, what, status=None):
         self.when = when
-        self.where = where
-        self.action = action
+        self.what = what
         self.status = status
         if self.status:
             self.status = self.status.upper()
 
-    def is_satisfied(self, when, where, status=None):
+    def is_satisfied(self, when, what, status=None):
         """
-        >>> Condition('post', 'BuildIn.*', '').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
+        >>> Condition('pre', 'BuildIn.*').is_satisfied('pre', 'BuildIn.Should Be Equal')
         True
-        >>> Condition('pre', 'BuildIn.*', '').is_satisfied('pre', 'BuildIn.Should Be Equal')
+        >>> Condition('pre', 'BuildIn.*').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
+        False
+        >>> Condition('post', 'BuildIn.*').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
         True
-        >>> Condition('pre', 'BuildIn.*', '').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
+        >>> Condition('post', 'BuildIn.*').is_satisfied('pre', 'BuildIn.Should Be Equal')
         False
-        >>> Condition('post', 'BuildIn.*', '').is_satisfied('pre', 'BuildIn.Should Be Equal')
+        >>> Condition('post', '!BuildIn.*').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
         False
-        >>> Condition('post', '!BuildIn.*', '').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
+        >>> Condition('post', 'fbSeleniumLibrary.*').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
         False
-        >>> Condition('post', 'fbSeleniumLibrary.*', '').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
-        False
-        >>> Condition('post', '!fbSeleniumLibrary.*', '').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
+        >>> Condition('post', '!fbSeleniumLibrary.*').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
         True
-        >>> Condition('post', '!BuildIn.Should Be Equal', '').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
+        >>> Condition('post', '!BuildIn.Should Be Equal').is_satisfied('post', 'BuildIn.Should Be Equal', 'fail')
         False
+        >>> Condition('post', '!BuildIn.Should Be Equal', 'fail').is_satisfied('post', 'fbSeleniumLibrary.Should Be Equal', 'fail')
+        True
+        >>> Condition('post', '!BuildIn.Should Be Equal', 'pass').is_satisfied('post', 'fbSeleniumLibrary.Should Be Equal', 'fail')
+        False
+        >>> Condition('post', '@fbSeleniumLibrary\..+').is_satisfied('post', 'fbSeleniumLibrary.Should Be Equal', 'fail')
+        True
+        >>> Condition('post', '@fbSeleniumLibrary\..+').is_satisfied('post', 'BuildIn.Should Be Equal')
+        False
+        >>> Condition('post', '@fbSeleniumLibrary\..+').is_satisfied('post', 'fbSeleniumLibrary.')
+        False
+        >>> Condition('post', '@(?!fbSeleniumLibrary\..+)').is_satisfied('post', 'BuildIn.Should Be Equal')
+        True
         """
         if self.status:
-            return re.match(self.when.replace('*', '.*'), when) != None and self.__match_where(where) and self.status == status.upper()
-        return re.match(self.when.replace('*', '.*'), when) != None and self.__match_where(where)
+            return re.match(self.when.replace('*', '.*'), when) != None and self.__match_what(what) and self.status == status.upper()
+        return re.match(self.when.replace('*', '.*'), when) != None and self.__match_what(what)
 
-    def __match_where(self, where):
-        if self.where.startswith("!"):
-            return not re.match("^%s$" % self.where[1:].replace('.', '\.').replace('*', '.*'), where)
-        return re.match("^%s$" % self.where.replace('.', '\.').replace('*', '.*'), where) != None
+    def __match_what(self, what):
+        if self.what.startswith("@"):
+            # return re.match("^%s$" % self.what[1:], what) != None
+            return re.match(self.what[1:], what) != None
+        if self.what.startswith("!"):
+            return not re.match("^%s$" % self.what[1:].replace('.', '\.').replace('*', '.+'), what)
+        return re.match("^%s$" % self.what.replace('.', '\.').replace('*', '.+'), what) != None
 
 class ActionMap:
     def __init__(self):
-        self.conditions = list()
+        self.conditional_actions = list()
 
     def mapping(self, resource):
         for keyword in resource.keywords:
@@ -66,36 +80,36 @@ class ActionMap:
             kwargs[arg.split('=')[0]] = arg.split('=')[1]
         return kwargs
 
-    def __build_map(self, keyword, when,  where, priority=1, status=None):
-        self.conditions.append(Condition(when, where, Action(keyword, priority), status))
+    def __build_map(self, keyword, when,  what, priority=1, status=None):
+        self.conditional_actions.append({'Condition':Condition(when, what, status), 'Action':Action(keyword, priority)})
 
-    def get_pre_actions(self, where):
+    def get_pre_actions(self, what):
         pre_actions = list()
-        for condition in self.conditions:
-            if condition.is_satisfied('pre', where, None):
-                pre_actions.append(condition.action)
+        for conditional_action in self.conditional_actions:
+            if conditional_action['Condition'].is_satisfied('pre', what, None):
+                pre_actions.append(conditional_action['Action'])
         return sorted(pre_actions, key=lambda action: action.priority)
 
-    def get_post_actions(self, where, status):
+    def get_post_actions(self, what, status):
         post_actions = list()
-        for condition in self.conditions:
-            if condition.is_satisfied('post', where, status):
-                post_actions.append(condition.action)
+        for conditional_action in self.conditional_actions:
+            if conditional_action['Condition'].is_satisfied('post', what, status):
+                post_actions.append(conditional_action['Action'])
         return sorted(post_actions, key=lambda action: action.priority)
 
 class ActionParser:
-    def __init__(self, resource_files):
-        self.resource_files = resource_files
+    def __init__(self, ppa_files):
+        self.ppa_files = ppa_files
         self.resources = self.__build_resource()
         self.action_map = ActionMap()
         self.__parse()
 
     def __build_resource(self):
-        return [ResourceFileBuilder().build(resource_file) for resource_file in self.resource_files]
+        return [ResourceFileBuilder().build(ppa_file) for ppa_file in self.ppa_files]
 
     def import_actions(self):
-        for resource_file in self.resource_files:
-            BuiltIn().import_resource(os.path.dirname(__file__).replace('\\', '/') + '/' + resource_file.replace('\\', '/'))
+        for ppa_file in self.ppa_files:
+            BuiltIn().import_resource(os.path.dirname(__file__).replace('\\', '/') + '/' + ppa_file.replace('\\', '/'))
 
     def __parse(self):
         for resource in self.resources:

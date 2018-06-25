@@ -2,7 +2,7 @@ import glob
 from action import ActionParser
 from robot.libraries.BuiltIn import BuiltIn
 
-class listener:
+class ActionListener:
     ROBOT_LISTENER_API_VERSION = 2
     def __init__(self):
         self.action_parser = ActionParser(glob.glob('**/*_ppa.robot', recursive=True) + glob.glob('**/*_ppa.txt', recursive=True))
